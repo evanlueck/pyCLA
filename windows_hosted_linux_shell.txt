@@ -1,0 +1,36 @@
+1) Find your ip on a windows computer using the command "ipconfig" in the terminal.
+	Your ip will be stored next to the statement "IPv4 address for eth0: "
+
+2) in the windows terminal run: 
+	netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=2222 connectaddress="your ip" connectport=2222
+	
+	netsh advfirewall firewall add rule name="Open Port 2222 for WSL2" dir=in action=allow protocol=TCP localport=2222
+
+The first command should respond with nothing while the second command should respond with "Ok."
+
+
+3) Now swap to your linux shell.
+	Run:	sudo service ssh start
+	if there is an error run: "ssh-keygen -A" and then run the previus code again.
+
+4) Everything should now be setup and the connections should be open.
+	To verify this, in the windows terminal, run: "netsh interface portproxy show v4tov4"
+	There should be a Listening Address of 0.0.0.0 with a port of 2222 and a connectable Address with your ip at the same port.
+
+5) You can now connect using Putty or another form of ssh connection service.
+	If there is another error, go back to the linux shell and
+	Run:	sudo vim /etc/ssh/ssh_config
+	and add
+		Port 2222
+		ListenAddress 0.0.0.0
+		PasswordAuthentication yes
+	to the file.
+	If the error persists connect to sshd_config with the same filepath and make sure PasswordAuthentication is set to yes there as well.
+	
+Run:	sudo service ssh restart
+	between each attempt.
+
+6) Lastly, to end the connection,
+	Run: 	netsh interface portproxy delete v4tov4 listenaddress=0.0.0.0 listenport=2222
+in your windows terminal.
+
